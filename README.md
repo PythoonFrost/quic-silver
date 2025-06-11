@@ -32,7 +32,7 @@ It is designed for cybersecurity research, QUIC traffic analysis, and validating
 
 Ensure the following are installed:
 
-- Python 3.8+
+- Python 3.10+
 - [aioquic](https://github.com/aiortc/aioquic)
 - [bcc](https://github.com/iovisor/bcc)
 - `scapy`
