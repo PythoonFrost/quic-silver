@@ -1,19 +1,19 @@
 # quictelemetry
 Real-time QUIC packet analysis, DDoS anomaly detection, and attack simulation using eBPF (BCC), Scapy, and aioquic. Includes tools for logging encrypted QUIC metadata, detecting Initial Flood and Slowloris-style attacks, visualizing CPU usage, and simulating QUIC-layer threats for research and SOC testing.
-# 🔐 QUIC Telemetry & Anomaly Detection (eBPF, Scapy, aioquic)
+# QUIC Telemetry & Anomaly Detection (eBPF, Scapy, aioquic)
 
 This project enables **real-time telemetry extraction**, **DDoS anomaly detection**, and **attack simulation** on **QUIC (UDP/4433)** traffic using a combination of:
 
-- 🔧 **eBPF with BCC**  
-- 🐍 **Scapy** for packet inspection  
-- 🌊 **aioquic** for QUIC-based attack generation  
-- 📈 **Matplotlib + CSV logging** for analysis and visualization  
+- **eBPF with BCC**  
+- **Scapy** for packet inspection  
+- **aioquic** for QUIC-based attack generation  
+- **Matplotlib + CSV logging** for analysis and visualization  
 
 It is designed for cybersecurity research, QUIC traffic analysis, and validating defenses against **Initial Flood** and **Slowloris-style** QUIC attacks.
 
 ---
 
-## 📂 Included Scripts
+## Included Scripts
 
 | Script | Description |
 |--------|-------------|
@@ -28,7 +28,7 @@ It is designed for cybersecurity research, QUIC traffic analysis, and validating
 
 ## ⚙️ Setup Instructions
 
-### ✅ Requirements
+### Requirements
 
 Ensure the following are installed:
 
@@ -39,7 +39,7 @@ Ensure the following are installed:
 - `matplotlib`
 - `pandas`
 
-### 📦 Install Python Dependencies
+### Install Python Dependencies
 
 ```bash
 pip install scapy matplotlib pandas aioquic
