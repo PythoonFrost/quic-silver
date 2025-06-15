@@ -113,6 +113,13 @@ Thanks goes to these wonderful people:
       </a>
       <br />Code
     </td>
+     <td align="center">
+      <!-- <a href="https://github.com/ArshadHussain50"> -->
+        <!-- <img src="https://avatars.githubusercontent.com/u/74283627?v=4" width="100px;" alt="Arshad Hussain"/> -->
+        <br /><sub><b>Ghazfa Yaseen</b></sub>
+      </a>
+      <br />Code
+    </td>
     <td align="center">
       <a href="https://github.com/Junaid-JavedUts">
         <img src="https://avatars.githubusercontent.com/u/212652385?v=4" width="100px;" alt="Rana Junaid Javed"/>
