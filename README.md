@@ -111,45 +111,49 @@ Thanks goes to these wonderful people:
         <img src="https://avatars.githubusercontent.com/u/74283627?v=4" width="100px;" alt="Arshad Hussain"/>
         <br /><sub><b>Arshad Hussain</b></sub>
       </a>
-      <br />Code
+      <br />
     </td>
-     <td align="center">
-      <!-- <a href="https://github.com/ArshadHussain50"> -->
-        <!-- <img src="https://avatars.githubusercontent.com/u/74283627?v=4" width="100px;" alt="Arshad Hussain"/> -->
-        <br /><sub><b>Ghazfa Yaseen</b></sub>
-      </a>
-      <br />Code
+      <td align="center">
+      <img src="https://via.placeholder.com/100x100.png?text=No+GitHub" width="100px;" alt="Ghazfa Yaseen"/>
+      <br /><sub><b>Ghazfa Yaseen</b></sub>
+      <br />
     </td>
     <td align="center">
       <a href="https://github.com/Junaid-JavedUts">
         <img src="https://avatars.githubusercontent.com/u/212652385?v=4" width="100px;" alt="Rana Junaid Javed"/>
         <br /><sub><b>Rana Junaid Javed</b></sub>
       </a>
-      <br />Code
+      <br />
     </td>
     <td align="center">
       <a href="https://github.com/naserkhan35">
         <img src="https://avatars.githubusercontent.com/u/77690716?v=4" width="100px;" alt="Naser Khan"/>
         <br /><sub><b>Naser Khan</b></sub>
       </a>
-      <br />Code
+      <br />
     </td>
     <td align="center">
       <a href="https://github.com/propakistani">
         <img src="https://avatars.githubusercontent.com/u/39987860?v=4" width="100px;" alt="Hamza Dar"/>
         <br /><sub><b>Hamza Dar</b></sub>
       </a>
-      <br />Code
+      <br />
     </td>
     <td align="center">
       <a href="https://github.com/syedumaid">
         <img src="https://avatars.githubusercontent.com/u/78684890?v=4" width="100px;" alt="Umaid Ahmed Syed"/>
         <br /><sub><b>Umaid Ahmed Syed</b></sub>
       </a>
-      <br />Code
+      <br />
     </td>
   </tr>
 </table>
+
+### Under the supervision of:
+
+**Justin Lipman**  
+<Justin.Lipman@uts.edu.au>  
+Faculty of Engineering and IT, University of Technology Sydney
 
 ## License
 
