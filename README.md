@@ -108,38 +108,38 @@ Thanks goes to these wonderful people:
   <tr>
     <td align="center">
       <a href="https://github.com/ArshadHussain50">
-        <img src="https://avatars.githubusercontent.com/u/77659137?v=4" width="100px;" alt="Arshad Hussain"/>
+        <img src="https://avatars.githubusercontent.com/u/74283627?v=4" width="100px;" alt="Arshad Hussain"/>
         <br /><sub><b>Arshad Hussain</b></sub>
       </a>
-      <br />💻 Code
+      <br />Code
     </td>
     <td align="center">
       <a href="https://github.com/Junaid-JavedUts">
-        <img src="https://avatars.githubusercontent.com/u/106076712?v=4" width="100px;" alt="Rana Junaid Javed"/>
+        <img src="https://avatars.githubusercontent.com/u/212652385?v=4" width="100px;" alt="Rana Junaid Javed"/>
         <br /><sub><b>Rana Junaid Javed</b></sub>
       </a>
-      <br />💻 Code
+      <br />Code
     </td>
     <td align="center">
       <a href="https://github.com/naserkhan35">
-        <img src="https://avatars.githubusercontent.com/u/103405957?v=4" width="100px;" alt="Naser Khan"/>
+        <img src="https://avatars.githubusercontent.com/u/77690716?v=4" width="100px;" alt="Naser Khan"/>
         <br /><sub><b>Naser Khan</b></sub>
       </a>
-      <br />💻 Code
+      <br />Code
     </td>
     <td align="center">
       <a href="https://github.com/propakistani">
-        <img src="https://avatars.githubusercontent.com/u/197735?v=4" width="100px;" alt="Hamza Dar"/>
+        <img src="https://avatars.githubusercontent.com/u/39987860?v=4" width="100px;" alt="Hamza Dar"/>
         <br /><sub><b>Hamza Dar</b></sub>
       </a>
-      <br />💻 Code
+      <br />Code
     </td>
     <td align="center">
       <a href="https://github.com/syedumaid">
-        <img src="https://avatars.githubusercontent.com/u/54969439?v=4" width="100px;" alt="Umaid Ahmed Syed"/>
+        <img src="https://avatars.githubusercontent.com/u/78684890?v=4" width="100px;" alt="Umaid Ahmed Syed"/>
         <br /><sub><b>Umaid Ahmed Syed</b></sub>
       </a>
-      <br />💻 Code | 🧠 Ideas
+      <br />Code
     </td>
   </tr>
 </table>
