@@ -100,6 +100,15 @@ cpu_utilization_with_python_vis.csv: Raw CPU usage logs
 
 python3_utilization_plot.png: Visual chart showing attack impact on python3 processes
 
+## Contributors
+
+Thanks goes to these wonderful people:
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
 ## License
 
 This project is for educational and research purposes.
