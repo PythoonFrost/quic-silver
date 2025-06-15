@@ -114,7 +114,7 @@ Thanks goes to these wonderful people:
       <br />
     </td>
       <td align="center">
-      <img src="https://via.placeholder.com/100x100.png?text=No+GitHub" width="100px;" alt="Ghazfa Yaseen"/>
+      <img src="https://avatars.githubusercontent.com/u/90524268?v=4" width="100px;" alt="Ghazfa Yaseen"/>
       <br /><sub><b>Ghazfa Yaseen</b></sub>
       <br />
     </td>
