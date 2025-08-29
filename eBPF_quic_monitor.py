@@ -40,27 +40,11 @@ CHECK_INTERVAL = 0.5  # Reduced to 0.5 seconds for earlier detection
 # number of packets per check interval to trigger a flood alert
 ALERT_FLOOD_THRESHOLD = 20  # Preliminary threshold for early detection
 
-
+# percentage of iniital connection attempt to consider for DDoS
 INITIAL_PERCENTAGE_THRESHOLD = 50  # Reduced to 50% for sensitivity
 UNIQUE_SCID_THRESHOLD = 0.8
 UNIQUE_DCID_THRESHOLD = 0.8
 
-
-# Python Ctypes Structure
-# hold telemetry data on the QUIC packet (header and pkt stuff)
-class Telemetry(Structure):
-    _fields_ = [
-        ("src_ip", c_uint32),
-        ("dst_ip", c_uint32),
-        ("src_port", c_uint16),
-        ("dst_port", c_uint16),
-        ("dcid", c_uint64),
-        ("scid", c_uint64),
-        ("pkt_len", c_uint16),
-        ("pkt_number", c_uint8),
-        ("pkt_type", c_uint8)
-    ]
-    
 # eBPF Program
 bpf_program = """
 #include <uapi/linux/ip.h>
@@ -133,8 +117,6 @@ BPF.attach_raw_socket(function, INTERFACE)
 # output to command line
 print(f"[+] Monitoring QUIC traffic on {INTERFACE}...")
 
-
-
 # Create CSV and ALERT files if not exists
 if not os.path.exists(CSV_LOG):
     with open(CSV_LOG, "w", newline="") as f:
@@ -148,16 +130,27 @@ if not os.path.exists(ALERT_FILE):
     with open(ALERT_FILE, "w") as f:
         f.write("")
 
+# Python Ctypes Structure
+# hold telemetry data on the QUIC packet (header and pkt stuff)
+class Telemetry(Structure):
+    _fields_ = [
+        ("src_ip", c_uint32),
+        ("dst_ip", c_uint32),
+        ("src_port", c_uint16),
+        ("dst_port", c_uint16),
+        ("dcid", c_uint64),
+        ("scid", c_uint64),
+        ("pkt_len", c_uint16),
+        ("pkt_number", c_uint8),
+        ("pkt_type", c_uint8)
+    ]
 
-# convert ip to string 
-### QUINN: standard library didn't have this ?!?
+# convert ip to string
 def ip_to_str(ip):
     return socket.inet_ntoa(struct.pack("I", ip))
 
-# return the (non-offiial) name of a packet
+# return the name of a packet
 # packet type data is stored in one byte
-
-### QUINN: Don't know what exactly each kind of byte signify, help would be appreciated
 def get_packet_type_name(pkt_type_byte):
     if (pkt_type_byte & 0x80) == 0:
         return "1-RTT Packet"
@@ -221,12 +214,11 @@ def handle_event(cpu, data, size):
     dst_ip = ip_to_str(event.dst_ip)
     
     # The ntohl() function converts the unsigned integer netlong from network byte order to host byte order
-    ### QUINN: wtf are these redundant a-- data structure!?!?!
+    # QUINN: wtf are these redundant a-- data structure!?!?!
     src_port = socket.ntohs(event.src_port)
     dst_port = socket.ntohs(event.dst_port)
     
-    # get the dcid hex in the correct format (big endian) using custom function 
-    ### QUINN: there has to be a standardised way to do this right?
+    # get the dcid hex in the correct format (big endian) using custom function
     dcid_hex = fix_endianess(hex(event.dcid))
     scid_hex = fix_endianess(hex(event.scid))
 
@@ -241,7 +233,7 @@ def handle_event(cpu, data, size):
         
         # check to see if packet is the initial handshake or 1 RTT
         # increment the equivalent counter if yes
-        ### QUINN: very wasterful, could've just passed on the packet type byte itself for the if statement
+        # QUINN: we could pass on packet type byte itself for the if statement
         if pkt_type_name == "Initial":
             initial_counter[src_ip] += 1
         elif pkt_type_name == "1-RTT Packet":
@@ -274,8 +266,9 @@ def handle_event(cpu, data, size):
         # is larger than the processing interval
         # if yes clear the data 
         # and set the number of prev packets for the last interval to be the number of packet recorded
-        ### QUINN: why do we do this like this? 
-        ### QUINN: Does seems like a good way to save on performace when the number of packets to be processed is low.
+
+        # QUINN: Does seems like a good way to save on performace when the number of packets to be processed is low
+        
         if current_time - last_window_time[src_ip] >= CHECK_INTERVAL:
             
             # set no. prev packet for the last interval
@@ -383,7 +376,7 @@ def handle_event(cpu, data, size):
                     else:
                         anomaly_state[src_ip] = "Normal"
             # same as above
-            ### QUINN: duplicate code, first else can be deleted
+            # QUINN: duplicate code, first else can be deleted
             else:
                 anomaly_state[src_ip] = "Normal"
             
