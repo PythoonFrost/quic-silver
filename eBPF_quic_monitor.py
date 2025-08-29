@@ -60,6 +60,58 @@ class Telemetry(Structure):
         ("pkt_number", c_uint8),
         ("pkt_type", c_uint8)
     ]
+    
+# eBPF Program
+bpf_program = """
+#include <uapi/linux/ip.h>
+#include <uapi/linux/udp.h>
+#include <linux/if_ether.h>
+#include <bcc/proto.h>
+struct telemetry_t {
+    u32 src_ip;
+    u32 dst_ip;
+    u16 src_port;
+    u16 dst_port;
+    u64 dcid;
+    u64 scid;
+    u16 pkt_len;
+    u8 pkt_number;
+    u8 pkt_type;
+};
+BPF_PERF_OUTPUT(events);
+int monitor_quic(struct __sk_buff *skb) {
+    struct ethhdr eth;
+    struct iphdr ip;
+    struct udphdr udp;
+    struct telemetry_t data = {};
+    u32 nh_off = ETH_HLEN;
+    if (bpf_skb_load_bytes(skb, 0, &eth, sizeof(eth)) < 0) return 0;
+    if (eth.h_proto != htons(ETH_P_IP)) return 0;
+    if (bpf_skb_load_bytes(skb, nh_off, &ip, sizeof(ip)) < 0) return 0;
+    if (ip.protocol != 17) return 0; // UDP
+    nh_off += ip.ihl * 4;
+    if (bpf_skb_load_bytes(skb, nh_off, &udp, sizeof(udp)) < 0) return 0;
+    if (udp.dest != htons(4433)) {
+        if (udp.source != htons(4433)) {
+            return 0;
+        }
+    } 
+    data.src_ip = ip.saddr;
+    data.dst_ip = ip.daddr;
+    data.src_port = udp.source;
+    data.dst_port = udp.dest;
+    data.pkt_len = skb->len;
+    nh_off += sizeof(udp);
+    u8 header[18] = {};
+    if (bpf_skb_load_bytes(skb, nh_off, header, sizeof(header)) < 0) return 0;
+    data.pkt_type = header[0];
+    data.dcid = *((u64 *)&header[1]);
+    data.scid = *((u64 *)&header[9]);
+    data.pkt_number = header[17];
+    events.perf_submit(skb, &data, sizeof(data));
+    return 0;
+}
+"""
 
 # Initialize BPF
 # utilising BCC (BPF Compiler Collection) C library to provide the necesseary functions
