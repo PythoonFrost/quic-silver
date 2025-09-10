@@ -43,7 +43,7 @@
         <mxCell id="PagSucDRu_iZHbHpeA6Z-9" value="Model Method" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="50" y="500" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="zJJDRKGVHjGuMtvpYUbA-1" value="List" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;" vertex="1" parent="1">
+        <mxCell id="zJJDRKGVHjGuMtvpYUbA-1" value="Controller" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;" vertex="1" parent="1">
           <mxGeometry x="355" y="260" width="140" height="104" as="geometry" />
         </mxCell>
         <mxCell id="zJJDRKGVHjGuMtvpYUbA-2" value="Inititaliser (Get data from Configuration file, launches other methods)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="zJJDRKGVHjGuMtvpYUbA-1">
