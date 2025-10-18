@@ -104,8 +104,7 @@ class InterfaceWorker(threading.Thread):
         
         with open(BPF_SOURCE_FILE, "r") as f:
             src = f.read()
-        # self.bpf = BPF(text=src)
-        self.bpf = BPF(text=src, cflags=["-I/usr/src/linux-headers-$(uname -r)/include"])
+        self.bpf = BPF(text=src)
 
 
         #the BPF program will be a BPF_PROG_TYPE_SOCKET_FILTER
@@ -189,3 +188,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
