@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from bcc import BPF
 from ctypes import Structure, c_uint32, c_uint64
+
+import ctypes
 import socket
 import sys
 import time
@@ -9,10 +11,12 @@ import argparse
 import os
 import signal
 import json
+import yaml
 
 # get the eBPF program source file and json log file 
+CONFIG_PATH = "/etc/quic-silver/config.yaml"
 BPF_SOURCE_FILE = "quic_monitor.c"
-JSON_LOG = "quic_summary_log.json"
+JSON_LOG = "/var/log/quic_summary_log.json"
 
 #define the structure for the eBPF program's output
 class Summary(Structure):
@@ -20,8 +24,8 @@ class Summary(Structure):
         ("src_ip", c_uint32),
         ("dst_ip", c_uint32),
         ("pkt_count", c_uint64),
-        ("conn_count", c_uint64),
         ("malformed_count", c_uint64),
+        ("initial_count", c_uint64),
         ("handshake_count", c_uint64),
     ]
 
@@ -41,6 +45,11 @@ def ip_to_str(ip):
         (ip >> 24) & 0xFF
     ]))
 
+#load the yaml data into a dicitonary
+def load_config():
+    with open(CONFIG_PATH, "r") as f:
+        return yaml.safe_load(f)
+
 def log_to_json(event, iface):
     # Log the summary event in JSON Lines format for Filebeat.
     entry = {
@@ -59,8 +68,9 @@ def log_to_json(event, iface):
         },
         "metrics": {
             "packet_count": event.pkt_count,
-            "connection_count": event.conn_count,
+            #"connection_count": event.conn_count,
             "handshake_count": event.handshake_count,
+            "initial_count": event.initial_count,
             "malformed_count": event.malformed_count
         }
     }
@@ -73,14 +83,21 @@ def log_to_json(event, iface):
 #format the summary to be displayed as f-strings
 def format_summary(event, iface):
     return (
+        f'[{time.strftime("%H:%M:%S%z")}]'
         f"[{iface}] {ip_to_str(event.src_ip)} → {ip_to_str(event.dst_ip)} | "
-        f"pkts={event.pkt_count:<6} conn={event.conn_count:<4} "
-        f"handshake={event.handshake_count:<3} malformed={event.malformed_count:<3}"
+        f"pkts={event.pkt_count:<6}" #f"conn={event.conn_count:<4} "
+        f"initial={event.initial_count:<3} handshake={event.handshake_count:<3} malformed={event.malformed_count:<3}"
     )
 
 #event handler for the ring buffer
-def handle_event(cpu, data, size, iface):
-    event = Summary.from_buffer_copy(data)
+def handle_event(cpu, data_ptr, size, iface):
+    #data_ptr is a pointer to the data due to perf_submit()
+    #extract buffer data
+    buf = ctypes.string_at(data_ptr, size)
+    #copy data into Summary struct
+    event = Summary.from_buffer_copy(buf)
+    
+    #print data to console and log to json
     print(format_summary(event, iface))
     log_to_json(event, iface)
 
@@ -115,12 +132,13 @@ class InterfaceWorker(threading.Thread):
         #this allows for events to call the handle_events function
         #the lambda function allows for self.iface to be captured
         rb = self.bpf["events"]
-        rb.open_ring_buffer(lambda cpu, data, size: handle_event(cpu, data, size, self.iface))
+        rb.open_perf_buffer(lambda cpu, data_ptr, size: handle_event(cpu, data_ptr, size, self.iface))
+        #rb.open_ring_buffer(lambda cpu, data_ptr, size: handle_event(cpu, data_ptr, size, self.iface))
 
         try:
             #while program is running poll for available data in the ring buffer and consume
             while self.running:
-                rb.poll(timeout=100)
+                self.bpf.perf_buffer_poll(100)
         except KeyboardInterrupt:
             pass
         finally:
@@ -139,6 +157,14 @@ class InterfaceWorker(threading.Thread):
 
 def main():
     
+    #load yaml into config as a dict
+    config = load_config()
+    
+    #use yaml value if exist. if not use default values
+    #BPF_SOURCE_FILE = config.get("bpf_source", "quic_monitor.c")
+    #JSON_LOG = config.get("json_log", "/var/log/quic_summary_log.json")
+    INTERFACES = config.get("interfaces", ["eth0"])
+    
     #we are using argparse to parse command line options
     parser = argparse.ArgumentParser(
         description="eBPF-based QUIC telemetry collector"
@@ -149,12 +175,18 @@ def main():
         "-i",
         "--interface",
         nargs="+",
-        required=True,
         help="Network interfaces to attach (e.g. eth0 eth1 wlan0)",
     )
     
     args = parser.parse_args()
 
+    #list of interfaces to monitor
+    #if there is a command line argument, use that over config and default list
+    if args.interface:
+        interface_list = args.interface
+    else:
+        interface_list = INTERFACES
+    
     #list of workers
     workers = []
 
@@ -173,7 +205,7 @@ def main():
     signal.signal(signal.SIGTERM, exit_handler)
 
     #launch a worker per interface listed
-    for iface in args.interface:
+    for iface in interface_list:
         w = InterfaceWorker(iface)
         w.start()
         workers.append(w)
@@ -188,6 +220,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
