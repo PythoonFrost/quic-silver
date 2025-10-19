@@ -3,6 +3,10 @@
 #include <linux/if_ether.h>
 #include <bcc/proto.h>
 
+#define MAX_GROUP_THRESHOLD 4096
+#define MIN_GROUP_THRESHOLD 1
+#define TIME_WINDOW (100 * 1000000ULL)
+
 BPF_PERF_OUTPUT(events);
 
 struct q_key_t {
@@ -15,6 +19,9 @@ struct q_stats_t {
     u64 malformed_count;
 	u64 initial_count;
     u64 handshake_count;
+	
+	u16 threshold;
+	u64 last_transmit_time;
 };
 
 BPF_HASH(quic_stats, struct q_key_t, struct q_stats_t);
@@ -141,7 +148,15 @@ int monitor_quic(struct __sk_buff *skb) {
 	if (!lookup_stats) {
 		return 0;
 	}
-
+	
+	//initialise threshold and time keeping variable
+	if (lookup_stats->threshold == 0) {
+        lookup_stats->threshold = MIN_GROUP_THRESHOLD;
+	}
+	if (lookup_stats->last_transmit_time == 0) {
+        lookup_stats->last_transmit_time = bpf_ktime_get_ns();
+	}
+	
 	lookup_stats->pkt_count++;
 
 	if (pkt_type == 4) {
@@ -151,8 +166,11 @@ int monitor_quic(struct __sk_buff *skb) {
 	} else if (pkt_type == 255) {
 		lookup_stats->malformed_count++;
 	}
-
-    if ((lookup_stats->pkt_count & 0xF) == 0) {
+	
+	
+	
+	//transmit if the packet count is larger than the threshold
+    if (lookup_stats->pkt_count >= lookup_stats->threshold) {
 
 		struct summary_t summary = {
             .src_ip = key.src_ip,
@@ -164,9 +182,28 @@ int monitor_quic(struct __sk_buff *skb) {
         };
 
         events.perf_submit(skb, &summary, sizeof(summary));
-
-		struct q_stats_t zero = {0};
-		quic_stats.update(&key, &zero);
+		
+		
+		//calculate the time between transmission
+		u64 now = bpf_ktime_get_ns();
+		u64 elapsed = now - lookup_stats->last_transmit_time;
+		
+		if (elapsed < TIME_WINDOW) {
+			if (lookup_stats->threshold < MAX_GROUP_THRESHOLD) {
+				lookup_stats->threshold <<= 1; //left shift by one bit, doubling the threshold
+			}
+		} else {
+			if (lookup_stats->threshold > MIN_GROUP_THRESHOLD) {
+				lookup_stats->threshold >>= 1; //right shift by one bit, halving the threshold
+			}
+		}
+		
+		//clear value for next transmission
+		lookup_stats->pkt_count = 0;
+        lookup_stats->malformed_count = 0;
+        lookup_stats->initial_count = 0;
+        lookup_stats->handshake_count = 0;
+        lookup_stats->last_transmit_time = now;
 
     }
 
