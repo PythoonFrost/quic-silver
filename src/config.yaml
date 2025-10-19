@@ -1,0 +1,14 @@
+interfaces:
+  - eth0
+  - wlan0
+
+bpf_source: /usr/local/bin/quic_monitor.c
+
+json_log: /var/log/quic_summary_log.json
+
+log_level: INFO
+
+threshold:
+  initial: 4
+  max: 4096
+  window_ms: 100
