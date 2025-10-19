@@ -1,0 +1,19 @@
+[Unit]
+Description=eBPF QUIC Telemetry Collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/quic_monitor.py   # adjust path
+Restart=on-failure
+RestartSec=5
+User=root
+Environment="QUIC_INTERFACES=eth0"                          # or multiple: "eth0 eth1"
+Environment="BPF_SOURCE_FILE=/usr/local/bin/quic_monitor.c"
+Environment="JSON_LOG=/var/log/quic_summary_log.json"
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

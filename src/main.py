@@ -11,7 +11,7 @@ import signal
 import json
 
 # get the eBPF program source file and json log file 
-BPF_SOURCE_FILE = "eBPF.c"
+BPF_SOURCE_FILE = "quic_monitor.c"
 JSON_LOG = "quic_summary_log.json"
 
 #define the structure for the eBPF program's output
@@ -101,16 +101,15 @@ class InterfaceWorker(threading.Thread):
         if not os.path.exists(BPF_SOURCE_FILE):
             print(f"Error: cannot find eBPF source file {BPF_SOURCE_FILE}")
             sys.exit(1)
-           
+        
         with open(BPF_SOURCE_FILE, "r") as f:
             src = f.read()
         self.bpf = BPF(text=src)
 
-        # Load and attach eBPF function
-        fn = self.bpf.load_func("monitor_quic", BPF.SCHED_CLS)
 
-        # Attach to interface, use Program type BPF_PROG_TYPE_XDP for ease of use
-        self.bpf.attach_xdp(self.iface, fn, 0)
+        #the BPF program will be a BPF_PROG_TYPE_SOCKET_FILTER
+        fn = self.bpf.load_func("monitor_quic", BPF.SOCKET_FILTER)
+        self.sock = self.bpf.attach_raw_socket(fn, self.iface)
 
         #open the ring buffer and register callback
         #this allows for events to call the handle_events function
@@ -119,9 +118,9 @@ class InterfaceWorker(threading.Thread):
         rb.open_ring_buffer(lambda cpu, data, size: handle_event(cpu, data, size, self.iface))
 
         try:
-            #while program is running poll for available data in rb and consume, if no data wait 100ms and then stop
+            #while program is running poll for available data in the ring buffer and consume
             while self.running:
-                self.bpf.ring_buffer_poll(rb, 100)
+                rb.poll(timeout=100)
         except KeyboardInterrupt:
             pass
         finally:
@@ -133,7 +132,8 @@ class InterfaceWorker(threading.Thread):
         self.running = False
         print(f"[x] Detaching eBPF program from {self.iface}")
         try:
-            self.bpf.remove_tc(dev=self.iface, attach_point="ingress")
+            if self.sock:
+                os.close(self.sock)
         except Exception as e:
             print(f"Warning: could not detach from {self.iface}: {e}")
 
@@ -188,3 +188,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
