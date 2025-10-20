@@ -1,4 +1,9 @@
 {
+  "network": {
+    "bind_ip": "0.0.0.0",
+    "bind_port": 4433,
+    "interfaces": ["eth0"]
+  },
   "alerts_file": "/var/log/alerts.json",
   "summary_interval_sec": 5,
   "rules": {
