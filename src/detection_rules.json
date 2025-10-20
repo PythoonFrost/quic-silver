@@ -1,0 +1,9 @@
+{
+  "alerts_file": "/var/log/alerts.json",
+  "summary_interval_sec": 5,
+  "rules": {
+    "max_packets_per_ip_per_sec": 5000,
+    "max_initial_handshakes_per_pair_per_min": 100,
+    "max_malformed_per_src_per_min": 10
+  }
+}
